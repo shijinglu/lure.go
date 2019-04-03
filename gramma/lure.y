@@ -20,7 +20,8 @@ package lure
 	doubleVal float64
 	strVal    string
 	expr      Expr
-	exprList  ExprList
+	exprList  *ExprList
+	savePoint *ExprList
 }
 
 // %parse-param {ExprList **rootExprList}
@@ -47,7 +48,7 @@ package lure
 
 %%
 expr_list
- : expr                 { $$ = exprListOfExpr($1); }
+ : expr                 { $$ = exprListOfExpr($1); saveListOfExpr(&(Lurercvr.lval), $$); }
  | expr_list ',' expr   { $$ = exprListAppend($1, $3); }
  ;
 

@@ -6,7 +6,7 @@ import (
 
 func TestLexer_Lex(t *testing.T) {
 
-	lexer0 := NewLexerOfString(`CITY_ID == 3 && (VERION == "v3.1.4" || PI < 3.14) && env in ("qa", "dev") `)
+	lexer0 := NewLexerOfString(`CITY_ID >= 3 && (VERION == "v3.1.4" || PI < 3.14) && env in ("qa", "dev") `)
 	type args struct {
 		lval *LureSymType
 	}
@@ -28,10 +28,10 @@ func TestLexer_Lex(t *testing.T) {
 			want:  TK_IDENTITY_LITERAL,
 		},
 		{
-			name:  "== is an op",
+			name:  ">= is an op",
 			lexer: lexer0,
 			args:  defaultArg,
-			want:  TK_EQ,
+			want:  TK_GE,
 		},
 		{
 			name:  "3 is an integer",

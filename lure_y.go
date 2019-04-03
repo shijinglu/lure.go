@@ -9,8 +9,9 @@ type LureSymType struct {
 	intVal    int
 	doubleVal float64
 	strVal    string
-	expr      *Expr
+	expr      Expr
 	exprList  *ExprList
+	savePoint *ExprList
 }
 
 const TK_AND_LOGIC = 57346
@@ -490,6 +491,7 @@ Luredefault:
 		LureDollar = LureS[Lurept-1 : Lurept+1]
 		{
 			LureVAL.exprList = exprListOfExpr(LureDollar[1].expr)
+			saveListOfExpr(&(Lurercvr.lval), LureVAL.exprList)
 		}
 	case 2:
 		LureDollar = LureS[Lurept-3 : Lurept+1]

@@ -1,5 +1,7 @@
 package lure
 
+import "fmt"
+
 // DataType represents all acceptable types in the context
 type DataType = int
 
@@ -22,65 +24,89 @@ type Data struct {
 	genericValType DataType
 }
 
+// IData ...
+type IData interface {
+	extKey() string
+	compareTo(rhs IData) int
+	toBoolean() bool
+	toInt() int
+	toDouble() float64
+	toString() string
+}
+
 // Expr ...
 type Expr interface {
+	isResolvable() bool
+
+	// evaluate resolves the expr and return data, usually it
+	// - returns FALSE if internal data is empty
+	// - returns internal data if context is empty or look-up miss
+	// - recursively resolve left node, right node and node list
+	// - perform logic operation (e.g. comparison, regex match etc) with
+	//   with respect to left, right and list nodes
+	evaluate(context map[string]IData) IData
 }
 
-// ExprList ...
-type ExprList interface {
+// ContextMap is a builder to construct context map
+type ContextMap struct {
+	m map[string]IData
 }
 
-func (xpList ExprList) get(i int) Expr {
-	return nil
+// NewContextMap returns a ContextMap instance
+func NewContextMap() ContextMap {
+	return ContextMap{
+		m: make(map[string]IData),
+	}
 }
 
-func exprListAppend(list *ExprList, expr *Expr) *ExprList {
-	return nil
+// AddInt adds int type context
+func (ctx ContextMap) AddInt(key string, val int) ContextMap {
+	ctx.m[key] = IntData{val: val}
+	return ctx
 }
 
-func exprListOfExpr(expr *Expr) *ExprList {
-	return nil
+// AddDouble add float64 type context
+func (ctx ContextMap) AddDouble(key string, val float64) ContextMap {
+	ctx.m[key] = DoubleData{val: val}
+	return ctx
 }
 
-func exprBinOp(lhs *Expr, op int, rhs *Expr) *Expr {
-	return nil
+// AddString add string type context
+func (ctx ContextMap) AddString(key string, val string) ContextMap {
+	ctx.m[key] = StringData{val: val}
+	return ctx
 }
 
-func exprIn(lhs *Expr, op int, list *ExprList) *Expr {
-	return nil
+// AddBoolean adds boolean type context
+func (ctx ContextMap) AddBoolean(key string, val bool) ContextMap {
+	ctx.m[key] = BoolData{val: val}
+	return ctx
 }
 
-func exprFunction0(fname string) *Expr {
-	return nil
+// AddCustom adds extended data type
+func (ctx ContextMap) AddCustom(ctxKey, ctxValRaw, typeName string) ContextMap {
+	if create, ok := getExtDataTypes()[typeName]; ok {
+		ctx.m[ctxKey] = create(ctxValRaw, typeName)
+	}
+	return ctx
 }
-func exprFunction(fname string, list *ExprList) *Expr {
-	return nil
-}
-func exprBetween(xp *Expr, xpMin *Expr, xpMax *Expr) *Expr {
-	return nil
-}
-func exprUnaryOp(op int, xp *Expr) *Expr {
-	return nil
-}
-func exprOfInt(val int) *Expr {
-	return nil
-}
-func exprOfDouble(val float64) *Expr {
-	return nil
-}
-func exprOfString(val string) *Expr {
-	return nil
-}
-func exprOfIdentity(val string) *Expr {
-	return nil
+
+// Build builds the context map
+func (ctx ContextMap) Build() map[string]IData {
+	return ctx.m
 }
 
 // Compile ...
-func Compile(str string) *Expr {
+func Compile(str string) Expr {
 	lexer := NewLexerOfString(str)
+	// NOTE: here is a hack, `LureParserImpl` is the implementation details
+	// that we are not suppose to use. We use it anyway because the generated
+	// interface `func LureParse(Lurelex LureLexer) int` does not return any
+	// thing useful.
 	parser := &LureParserImpl{}
-	parser.Parse(*lexer)
-	return parser.lval.exprList.get(0)
+	ret := parser.Parse(*lexer)
+	fmt.Println(ret)
+	return parser.lval.savePoint.get(0)
 }
 
 func main() {
