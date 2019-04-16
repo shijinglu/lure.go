@@ -3,7 +3,7 @@ package lure
 // ExprList manages a list of Expr for related operations
 // - exprs is the overall expressions added
 // - unresolved tracks the exprs that need context for resolution
-// - resolved tracks all the in-resolvable nodes
+// - resolved tracks all the nonresolvable nodes (like literals)
 type ExprList struct {
 	exprs      []Expr
 	unresolved []Expr

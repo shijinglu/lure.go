@@ -1,7 +1,5 @@
 package lure
 
-import "fmt"
-
 // DataType represents all acceptable types in the context
 type DataType = int
 
@@ -40,7 +38,7 @@ type Expr interface {
 
 	// evaluate resolves the expr and return data, usually it
 	// - returns FALSE if internal data is empty
-	// - returns internal data if context is empty or look-up miss
+	// - returns internal data if context is nil or look-up miss
 	// - recursively resolve left node, right node and node list
 	// - perform logic operation (e.g. comparison, regex match etc) with
 	//   with respect to left, right and list nodes
@@ -104,8 +102,7 @@ func Compile(str string) Expr {
 	// interface `func LureParse(Lurelex LureLexer) int` does not return any
 	// thing useful.
 	parser := &LureParserImpl{}
-	ret := parser.Parse(*lexer)
-	fmt.Println(ret)
+	parser.Parse(*lexer)
 	return parser.lval.savePoint.get(0)
 }
 

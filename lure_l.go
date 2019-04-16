@@ -30,7 +30,6 @@ func NewLexerOfString(str string) *Lexer {
 // Lex ...
 func (l Lexer) Lex(lval *LureSymType) int {
 	var acc string
-	fmt.Printf("[%p] pos: %s, l.s.peek(): %s \n", &(l.s), l.s.Pos(), scanner.TokenString(l.s.Peek()))
 	for tok := l.s.Scan(); tok != scanner.EOF; tok = l.s.Scan() {
 		switch tok {
 		case scanner.Ident:
@@ -110,7 +109,6 @@ func (l Lexer) Lex(lval *LureSymType) int {
 				return int(tok)
 			}
 		}
-		fmt.Printf("[%v] %s: %s\n", l.s.Position, l.s.TokenText(), scanner.TokenString(tok))
 	}
 	return 0
 }
